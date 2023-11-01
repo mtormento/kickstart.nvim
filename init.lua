@@ -151,12 +151,10 @@ require('lazy').setup({
   },
 
   {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
+    "folke/tokyonight.nvim",
+    lazy = false,
     priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
+    opts = {},
   },
 
   {
@@ -166,10 +164,24 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'onedark',
+        theme = 'tokyonight',
         component_separators = '|',
         section_separators = '',
       },
+      sections = {
+        lualine_c = {
+          {
+            'filename',
+            path = 1,                -- 0: Just the filename
+                                     -- 1: Relative path
+                                     -- 2: Absolute path
+                                     -- 3: Absolute path, with tilde as the home directory
+                                     -- 4: Filename and parent dir, with tilde as the home directory
+
+            shorting_target = 40,    -- Shortens path to leave 40 spaces in the window
+          }
+        }
+      }
     },
   },
 
@@ -228,6 +240,26 @@ require('lazy').setup({
   --
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
   -- { import = 'custom.plugins' },
+
+  {
+    'alexghergh/nvim-tmux-navigation',
+    config = function()
+        require'nvim-tmux-navigation'.setup {
+            disable_when_zoomed = false,
+            keybindings = {
+                left = "<C-h>",
+                down = "<C-j>",
+                up = "<C-k>",
+                right = "<C-l>",
+                last_active = "<C-\\>",
+                next = "<C-Space>",
+            }
+        }
+    end
+  },
+  'nvim-tree/nvim-tree.lua',
+  {'kevinhwang91/promise-async'},
+  {'kevinhwang91/nvim-ufo', requires = 'kevinhwang91/promise-async'},
 }, {})
 
 -- [[ Setting options ]]
@@ -270,6 +302,8 @@ vim.o.completeopt = 'menuone,noselect'
 
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
+
+vim.cmd[[colorscheme tokyonight]]
 
 -- [[ Basic Keymaps ]]
 
@@ -493,6 +527,11 @@ require('neodev').setup()
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+-- for nvim-ufo
+capabilities.textDocument.foldingRange = {
+    dynamicRegistration = false,
+    lineFoldingOnly = true
+}
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
@@ -559,6 +598,81 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+-- [[ Configure nvim-tree ]]
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+require("nvim-tree").setup {
+  auto_reload_on_write = true,
+  view = {
+    width = 60,
+    float = {
+      enable = false,
+      quit_on_focus_loss = true,
+      open_win_config = {
+        relative = "editor",
+        border = "rounded",
+        width = 30,
+        height = 30,
+        row = 1,
+        col = 1,
+      },
+    },
+  },
+  renderer = {
+    highlight_opened_files = "none",
+    highlight_modified = "none",
+  },
+  actions = {
+    use_system_clipboard = true,
+    open_file = {
+      quit_on_open = true,
+      resize_window = true,
+      window_picker = {
+        enable = true,
+        picker = "default",
+        chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+        exclude = {
+          filetype = { "notify", "packer", "qf", "diff", "fugitive", "fugitiveblame" },
+          buftype = { "nofile", "terminal", "help" },
+        },
+      },
+    },
+    remove_file = {
+      close_window = true,
+    },
+  },
+  diagnostics = {
+    enable = true,
+    show_on_dirs = false,
+    show_on_open_dirs = true,
+    debounce_delay = 50,
+    severity = {
+      min = vim.diagnostic.severity.HINT,
+      max = vim.diagnostic.severity.ERROR,
+    },
+    icons = {
+      hint = "",
+      info = "",
+      warning = "",
+      error = "",
+    },
+  },
+}
+vim.keymap.set('n', ',m', require('nvim-tree.api').tree.toggle, { desc = 'Toggle nvim-tree' })
+vim.keymap.set('n', ',n', require('nvim-tree.api').tree.find_file, { desc = 'Find file in nvim-tree' })
+
+-- [[ Configure nvim-ufo ]]
+vim.o.foldcolumn = '1' -- '0' is not bad
+vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+
+-- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
+vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
+
+require('ufo').setup()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

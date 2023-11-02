@@ -303,6 +303,8 @@ vim.o.termguicolors = true
 
 vim.cmd [[colorscheme tokyonight]]
 
+vim.opt.relativenumber = true
+
 -- [[ Basic Keymaps ]]
 
 -- Keymaps for better default experience

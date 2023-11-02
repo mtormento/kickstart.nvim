@@ -303,6 +303,17 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
+-- [[ Format on save ]]
+-- See `:help vim.lsp.buf.format()`
+local auto_format_group = vim.api.nvim_create_augroup('AutoFormat', { clear = true })
+vim.api.nvim_create_autocmd('BufWritePre', {
+  callback = function()
+    vim.lsp.buf.format()
+  end,
+  group = auto_format_group,
+  pattern = '*',
+})
+
 vim.cmd[[colorscheme tokyonight]]
 
 -- [[ Basic Keymaps ]]
@@ -509,7 +520,6 @@ local servers = {
   -- clangd = {},
   -- gopls = {},
   -- pyright = {},
-  -- rust_analyzer = {},
   -- tsserver = {},
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
 
@@ -517,6 +527,13 @@ local servers = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
+    },
+    rust_analyzer = {
+      -- enable clippy on save
+      checkOnSave = {
+        command = "clippy",
+        extraArgs = {"--tests"},
+      },
     },
   },
 }

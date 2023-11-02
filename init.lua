@@ -110,7 +110,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim',  opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -172,13 +172,13 @@ require('lazy').setup({
         lualine_c = {
           {
             'filename',
-            path = 1,                -- 0: Just the filename
-                                     -- 1: Relative path
-                                     -- 2: Absolute path
-                                     -- 3: Absolute path, with tilde as the home directory
-                                     -- 4: Filename and parent dir, with tilde as the home directory
+            path = 1, -- 0: Just the filename
+            -- 1: Relative path
+            -- 2: Absolute path
+            -- 3: Absolute path, with tilde as the home directory
+            -- 4: Filename and parent dir, with tilde as the home directory
 
-            shorting_target = 40,    -- Shortens path to leave 40 spaces in the window
+            shorting_target = 40, -- Shortens path to leave 40 spaces in the window
           }
         }
       }
@@ -230,7 +230,7 @@ require('lazy').setup({
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
-  -- require 'kickstart.plugins.autoformat',
+  require 'kickstart.plugins.autoformat',
   -- require 'kickstart.plugins.debug',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
@@ -239,27 +239,25 @@ require('lazy').setup({
   --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 
   {
     'alexghergh/nvim-tmux-navigation',
     config = function()
-        require'nvim-tmux-navigation'.setup {
-            disable_when_zoomed = false,
-            keybindings = {
-                left = "<C-h>",
-                down = "<C-j>",
-                up = "<C-k>",
-                right = "<C-l>",
-                last_active = "<C-\\>",
-                next = "<C-Space>",
-            }
+      require 'nvim-tmux-navigation'.setup {
+        disable_when_zoomed = false,
+        keybindings = {
+          left = "<C-h>",
+          down = "<C-j>",
+          up = "<C-k>",
+          right = "<C-l>",
+          last_active = "<C-\\>",
+          next = "<C-Space>",
         }
+      }
     end
   },
-  'nvim-tree/nvim-tree.lua',
-  {'kevinhwang91/promise-async'},
-  {'kevinhwang91/nvim-ufo', requires = 'kevinhwang91/promise-async'},
+  { 'kevinhwang91/nvim-ufo',  dependencies = 'kevinhwang91/promise-async' },
 }, {})
 
 -- [[ Setting options ]]
@@ -303,18 +301,7 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
--- [[ Format on save ]]
--- See `:help vim.lsp.buf.format()`
-local auto_format_group = vim.api.nvim_create_augroup('AutoFormat', { clear = true })
-vim.api.nvim_create_autocmd('BufWritePre', {
-  callback = function()
-    vim.lsp.buf.format()
-  end,
-  group = auto_format_group,
-  pattern = '*',
-})
-
-vim.cmd[[colorscheme tokyonight]]
+vim.cmd [[colorscheme tokyonight]]
 
 -- [[ Basic Keymaps ]]
 
@@ -378,7 +365,8 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
+      'bash' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -532,7 +520,7 @@ local servers = {
       -- enable clippy on save
       checkOnSave = {
         command = "clippy",
-        extraArgs = {"--tests"},
+        extraArgs = { "--tests" },
       },
     },
   },
@@ -546,8 +534,8 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 -- for nvim-ufo
 capabilities.textDocument.foldingRange = {
-    dynamicRegistration = false,
-    lineFoldingOnly = true
+  dynamicRegistration = false,
+  lineFoldingOnly = true
 }
 
 -- Ensure the servers above are installed
@@ -616,72 +604,9 @@ cmp.setup {
   },
 }
 
--- [[ Configure nvim-tree ]]
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-require("nvim-tree").setup {
-  auto_reload_on_write = true,
-  view = {
-    width = 60,
-    float = {
-      enable = false,
-      quit_on_focus_loss = true,
-      open_win_config = {
-        relative = "editor",
-        border = "rounded",
-        width = 30,
-        height = 30,
-        row = 1,
-        col = 1,
-      },
-    },
-  },
-  renderer = {
-    highlight_opened_files = "none",
-    highlight_modified = "none",
-  },
-  actions = {
-    use_system_clipboard = true,
-    open_file = {
-      quit_on_open = true,
-      resize_window = true,
-      window_picker = {
-        enable = true,
-        picker = "default",
-        chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
-        exclude = {
-          filetype = { "notify", "packer", "qf", "diff", "fugitive", "fugitiveblame" },
-          buftype = { "nofile", "terminal", "help" },
-        },
-      },
-    },
-    remove_file = {
-      close_window = true,
-    },
-  },
-  diagnostics = {
-    enable = true,
-    show_on_dirs = false,
-    show_on_open_dirs = true,
-    debounce_delay = 50,
-    severity = {
-      min = vim.diagnostic.severity.HINT,
-      max = vim.diagnostic.severity.ERROR,
-    },
-    icons = {
-      hint = "",
-      info = "",
-      warning = "",
-      error = "",
-    },
-  },
-}
-vim.keymap.set('n', ',m', require('nvim-tree.api').tree.toggle, { desc = 'Toggle nvim-tree' })
-vim.keymap.set('n', ',n', require('nvim-tree.api').tree.find_file, { desc = 'Find file in nvim-tree' })
-
 -- [[ Configure nvim-ufo ]]
 vim.o.foldcolumn = '1' -- '0' is not bad
-vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevel = 99   -- Using ufo provider need a large value, feel free to decrease the value
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true
 
@@ -690,6 +615,19 @@ vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
 vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 
 require('ufo').setup()
+
+-- [[ Configure neo-tree ]]
+vim.keymap.set('n', ',m', function()
+    require('neo-tree.command').execute({
+      position = "left",
+      toggle = true,
+    })
+  end,
+  { desc = 'Toggle neo-tree' })
+vim.keymap.set('n', ',n', function()
+    require('neo-tree.command').execute({ reveal = true, })
+  end,
+  { desc = 'Reveal file in neo-tree' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

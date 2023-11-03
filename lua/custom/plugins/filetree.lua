@@ -14,9 +14,27 @@ return {
 			window = {
 				mappings = {
 					["<cr>"] = "show_file_details",
-					["i"] = "open",
+					["o"] = { "open", nowait = true },
 				}
 			},
+			filesystem = {
+				window = {
+					mappings = {
+						["i"] = { "show_help", nowait = false, config = {
+							title = "Order by",
+							prefix_key = "i"
+						} },
+						["ic"] = { "order_by_created", nowait = false },
+						["id"] = { "order_by_diagnostics", nowait = false },
+						["ig"] = { "order_by_git_status", nowait = false },
+						["im"] = { "order_by_modified", nowait = false },
+						["in"] = { "order_by_name", nowait = false },
+						["is"] = { "order_by_size", nowait = false },
+						["it"] = { "order_by_type", nowait = false },
+					}
+				},
+
+			}
 		}
 	end,
 }

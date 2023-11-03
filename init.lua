@@ -518,13 +518,24 @@ local servers = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
     },
-    rust_analyzer = {
+  },
+  rust_analyzer = {
+    ["rust-analyzer"] = {
+      -- cargo check outputs weird errors, let's use clippy instead
+      cargo = {
+        check = {
+          overrideCommand = { "cargo", "clippy", "--tests", "--message-format=json" }
+        },
+        buildScripts = {
+          overrideCommand = { "cargo", "clippy", "--tests", "--message-format=json" }
+        }
+      },
       -- enable clippy on save
       checkOnSave = {
         command = "clippy",
         extraArgs = { "--tests" },
       },
-    },
+    }
   },
 }
 

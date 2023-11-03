@@ -241,23 +241,6 @@ require('lazy').setup({
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
   { import = 'custom.plugins' },
 
-  {
-    'alexghergh/nvim-tmux-navigation',
-    config = function()
-      require 'nvim-tmux-navigation'.setup {
-        disable_when_zoomed = false,
-        keybindings = {
-          left = "<C-h>",
-          down = "<C-j>",
-          up = "<C-k>",
-          right = "<C-l>",
-          last_active = "<C-\\>",
-          next = "<C-Space>",
-        }
-      }
-    end
-  },
-  { 'kevinhwang91/nvim-ufo',  dependencies = 'kevinhwang91/promise-async' },
 }, {})
 
 -- [[ Setting options ]]

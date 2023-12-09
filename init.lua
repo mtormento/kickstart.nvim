@@ -284,7 +284,7 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
-vim.cmd [[colorscheme tokyonight]]
+vim.cmd [[colorscheme tokyonight-night]]
 
 vim.opt.relativenumber = true
 

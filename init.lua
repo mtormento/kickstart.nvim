@@ -158,6 +158,10 @@ require('lazy').setup({
   },
 
   {
+    "ggandor/leap.nvim"
+  },
+
+  {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
@@ -649,6 +653,9 @@ vim.keymap.set('n', ',n', function()
     require('neo-tree.command').execute({ reveal = true, })
   end,
   { desc = 'Reveal file in neo-tree' })
+
+-- [[ Configure leap ]]
+require('leap').create_default_mappings()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

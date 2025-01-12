@@ -92,7 +92,10 @@ require('lazy').setup({
       'folke/neodev.nvim',
     },
   },
-
+  -- glslView
+  {
+    'timtro/glslView-nvim'
+  },
   {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
@@ -156,11 +159,24 @@ require('lazy').setup({
     priority = 1000,
     opts = {},
   },
-
   {
-    "ggandor/leap.nvim"
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {
+      modes = {
+        search = {
+          enabled = true
+        }
+      }
+    },
+    keys = {
+      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
+      { "S",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
+      { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
+      { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+      { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
+    },
   },
-
   {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
@@ -511,7 +527,7 @@ local servers = {
   -- pyright = {},
   -- tsserver = {},
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
-
+  glsl_analyzer = {},
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
@@ -666,8 +682,11 @@ vim.keymap.set('n', ',n', function()
   end,
   { desc = 'Reveal file in neo-tree' })
 
--- [[ Configure leap ]]
-require('leap').create_default_mappings()
+-- [[ Configure glslView ]]
+require('glslView').setup {
+  viewer_path = '/usr/bin/glslViewer',
+  args = { '-l' },
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

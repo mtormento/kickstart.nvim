@@ -43,6 +43,11 @@ P.S. You can delete this when you're done too. It's your config now :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+local set = vim.opt -- set options
+set.tabstop = 4
+set.softtabstop = 4
+set.shiftwidth = 4
+
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -69,10 +74,21 @@ require('lazy').setup({
 
   -- Git related plugins
   'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
+  -- 'tpope/vim-rhubarb',
 
-  -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-sleuth',
+  -- nvim-spider
+  {
+    "chrisgrieser/nvim-spider",
+    lazy = true,
+    keys = {
+      { "w", "<cmd>lua require('spider').motion('w')<CR>", mode = { "n", "o", "x" } },
+      { "e", "<cmd>lua require('spider').motion('e')<CR>", mode = { "n", "o", "x" } },
+      { "b", "<cmd>lua require('spider').motion('b')<CR>", mode = { "n", "o", "x" } },
+    },
+  },
+
+  -- -- Detect tabstop and shiftwidth automatically
+  -- 'tpope/vim-sleuth',
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -92,10 +108,7 @@ require('lazy').setup({
       'folke/neodev.nvim',
     },
   },
-  -- glslView
-  {
-    'timtro/glslView-nvim'
-  },
+
   {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
@@ -108,7 +121,7 @@ require('lazy').setup({
       'hrsh7th/cmp-nvim-lsp',
 
       -- Adds a number of user-friendly snippets
-      'rafamadriz/friendly-snippets',
+      --'rafamadriz/friendly-snippets',
     },
   },
 
@@ -159,24 +172,11 @@ require('lazy').setup({
     priority = 1000,
     opts = {},
   },
+
   {
-    "folke/flash.nvim",
-    event = "VeryLazy",
-    opts = {
-      modes = {
-        search = {
-          enabled = true
-        }
-      }
-    },
-    keys = {
-      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
-      { "S",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
-      { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
-      { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-      { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
-    },
+    "ggandor/leap.nvim"
   },
+
   {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
@@ -527,7 +527,7 @@ local servers = {
   -- pyright = {},
   -- tsserver = {},
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
-  glsl_analyzer = {},
+
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
@@ -657,35 +657,29 @@ cmp.setup {
   },
 }
 
--- [[ Configure nvim-ufo ]]
-vim.o.foldcolumn = '1' -- '0' is not bad
-vim.o.foldlevel = 99   -- Using ufo provider need a large value, feel free to decrease the value
-vim.o.foldlevelstart = 99
-vim.o.foldenable = true
-
--- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
-vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
-vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
-
-require('ufo').setup()
-
 -- [[ Configure neo-tree ]]
 vim.keymap.set('n', ',m', function()
     require('neo-tree.command').execute({
-      position = "left",
+      position = "float",
+      reveal = true,
       toggle = true,
     })
   end,
   { desc = 'Toggle neo-tree' })
 vim.keymap.set('n', ',n', function()
-    require('neo-tree.command').execute({ reveal = true, })
+    require('neo-tree.command').execute({ reveal = true, position = "float" })
   end,
   { desc = 'Reveal file in neo-tree' })
 
--- [[ Configure glslView ]]
-require('glslView').setup {
-  viewer_path = '/usr/bin/glslViewer',
-  args = { '-l' },
+-- [[ Configure leap ]]
+require('leap').create_default_mappings()
+
+-- [[ Configure spider ]]
+require("spider").setup {
+  skipInsignificantPunctuation = true,
+  consistentOperatorPending = false, -- see the README for details
+  subwordMovement = true,
+  customPatterns = {},               -- see the README for details
 }
 
 -- The line beneath this is called `modeline`. See `:help modeline`

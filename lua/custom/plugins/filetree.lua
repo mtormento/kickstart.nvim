@@ -15,6 +15,10 @@ return {
 				mappings = {
 					["<cr>"] = "show_file_details",
 					["o"] = { "open", nowait = true },
+					["S"] = { "open_split", nowait = true },
+					["s"] = { "open_vsplit", nowait = true },
+					["t"] = { "open_tabnew", nowait = true },
+					["w"] = { "open_with_window_picker", nowait = true },
 				}
 			},
 			filesystem = {

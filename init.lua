@@ -571,42 +571,41 @@ local mason_lspconfig = require 'mason-lspconfig'
 
 mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
-}
+  handlers = {
+    function(server_name)
+      require('lspconfig')[server_name].setup {
+        capabilities = capabilities,
+        on_attach = on_attach,
+        settings = servers[server_name],
+        filetypes = (servers[server_name] or {}).filetypes,
+      }
+    end,
 
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
-  end,
-
-  ["clangd"] = function()
-    local lspconfig = require('lspconfig');
-    lspconfig.clangd.setup {
-      on_attach = function(_, bufnr)
-        on_attach(_, bufnr);
-        vim.keymap.set('n', '<leader>cR', function()
-          vim.cmd("ClangdSwitchSourceHeader");
-        end, { buffer = bufnr, desc = 'LSP: Switch Source/Header (C/C++)' });
-      end,
-      capabilities = capabilities,
-      cmd = { "/usr/bin/clangd" },
-      filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
-      root_dir = lspconfig.util.root_pattern(
-        '.clangd'
-        , '.clang-tidy'
-        , '.clang-format'
-        , 'compile_commands.json'
-        , 'compile_flags.txt'
-        , 'configure.ac'
-        , '.git'
-      ),
-      single_file_support = true,
-    }
-  end,
+    ["clangd"] = function()
+      local lspconfig = require('lspconfig');
+      lspconfig.clangd.setup {
+        on_attach = function(_, bufnr)
+          on_attach(_, bufnr);
+          vim.keymap.set('n', '<leader>cR', function()
+            vim.cmd("ClangdSwitchSourceHeader");
+          end, { buffer = bufnr, desc = 'LSP: Switch Source/Header (C/C++)' });
+        end,
+        capabilities = capabilities,
+        cmd = { "/usr/bin/clangd" },
+        filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
+        root_dir = lspconfig.util.root_pattern(
+          '.clangd'
+          , '.clang-tidy'
+          , '.clang-format'
+          , 'compile_commands.json'
+          , 'compile_flags.txt'
+          , 'configure.ac'
+          , '.git'
+        ),
+        single_file_support = true,
+      }
+    end,
+  }
 }
 
 -- [[ Configure nvim-cmp ]]

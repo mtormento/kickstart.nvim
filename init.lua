@@ -508,52 +508,6 @@ require('which-key').add {
   { '<leader>w', desc = '[W]orkspace' },
 }
 
--- mason-lspconfig requires that these setup functions are called in this order
--- before setting up the servers.
-require('mason').setup()
-require('mason-lspconfig').setup()
-
--- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yourself.
---
---  If you want to override the default filetypes that your language server will attach to you can
---  define the property 'filetypes' to the map in question.
-local servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
-
-  lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
-  },
-  rust_analyzer = {
-    ["rust-analyzer"] = {
-      -- cargo check outputs weird errors, let's use clippy instead
-      cargo = {
-        check = {
-          overrideCommand = { "cargo", "clippy", "--tests", "--message-format=json" }
-        },
-        buildScripts = {
-          overrideCommand = { "cargo", "clippy", "--tests", "--message-format=json" }
-        }
-      },
-      -- enable clippy on save
-      checkOnSave = {
-        command = "clippy",
-        extraArgs = { "--tests" },
-      },
-    }
-  },
-}
-
 -- Setup neovim lua configuration
 require('neodev').setup()
 
@@ -566,48 +520,69 @@ capabilities.textDocument.foldingRange = {
   lineFoldingOnly = true
 }
 
+-- mason-lspconfig requires that these setup functions are called in this order
+-- before setting up the servers.
+require('mason').setup()
+
 -- Ensure the servers above are installed
-local mason_lspconfig = require 'mason-lspconfig'
+require('mason-lspconfig').setup({
+  ensure_installed = {
+    'lua_ls',
+    'rust_analyzer',
+    'clangd',
+  },
+  automatic_enable = true, -- Mason-LSPConfig v2 auto-enables servers by default
+})
 
-mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
-}
-
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
+vim.lsp.config('clangd', {
+  on_attach = function(_, bufnr)
+    on_attach(_, bufnr);
+    vim.keymap.set('n', '<leader>cR', function()
+      vim.cmd("ClangdSwitchSourceHeader");
+    end, { buffer = bufnr, desc = 'LSP: Switch Source/Header (C/C++)' });
   end,
+  capabilities = capabilities,
+  cmd = { "/usr/bin/clangd" },
+  filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
+  -- root_dir = require('lspconfig').util.root_pattern(
+  --   '.clangd'
+  --   , '.clang-tidy'
+  --   , '.clang-format'
+  --   , 'compile_commands.json'
+  --   , 'compile_flags.txt'
+  --   , 'configure.ac'
+  --   , '.git'
+  -- ),
+  single_file_support = true,
+})
 
-  ["clangd"] = function()
-    local lspconfig = require('lspconfig');
-    lspconfig.clangd.setup {
-      on_attach = function(_, bufnr)
-        on_attach(_, bufnr);
-        vim.keymap.set('n', '<leader>cR', function()
-          vim.cmd("ClangdSwitchSourceHeader");
-        end, { buffer = bufnr, desc = 'LSP: Switch Source/Header (C/C++)' });
-      end,
-      capabilities = capabilities,
-      cmd = { "/usr/bin/clangd" },
-      filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
-      root_dir = lspconfig.util.root_pattern(
-        '.clangd'
-        , '.clang-tidy'
-        , '.clang-format'
-        , 'compile_commands.json'
-        , 'compile_flags.txt'
-        , 'configure.ac'
-        , '.git'
-      ),
-      single_file_support = true,
+vim.lsp.config('lua_ls', {
+  on_attach = on_attach,
+  settings = {
+    Lua = {
+      workspace = { checkThirdParty = false },
+      telemetry = { enable = false },
+    },
+  }
+})
+
+vim.lsp.config('rust_analyzer', {
+  on_attach = on_attach,
+  -- cargo check outputs weird errors, let's use clippy instead
+  cargo = {
+    check = {
+      overrideCommand = { "cargo", "clippy", "--tests", "--message-format=json" }
+    },
+    buildScripts = {
+      overrideCommand = { "cargo", "clippy", "--tests", "--message-format=json" }
     }
-  end,
-}
+  },
+  -- enable clippy on save
+  checkOnSave = {
+    command = "clippy",
+    extraArgs = { "--tests" },
+  },
+})
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
